@@ -181,40 +181,6 @@ def calculate_distance(row):
 #        row["cash_prooflink"] = "No link"
 #    return row
 
-  
-def check_for_lateness(row):
-    if option == "Today":
-        cutoff_time = datetime.datetime.strptime(f"{datetime.datetime.today().strftime('%Y-%m-%d')} {row['cutoff']}", "%Y-%m-%d %H:%M")
-        current_time = datetime.datetime.now().astimezone(timezone(client_timezone)).replace(tzinfo=None)
-        if cutoff_time > current_time:
-            difference_munutes = 0  # ignore such cases
-        else:
-            difference = current_time - cutoff_time
-            difference_munutes = int(difference.total_seconds()) / 60
-    elif option == "Yesterday":
-        difference_munutes = 999  # magic number that is >30
-    try:
-        created_amt = row["1. created"]
-    except:
-        created_amt = "-"
-    try:
-        assigned_amt = row["2. assigned"]
-    except:
-        assigned_amt = "-"
-    try:
-        pickuped_amt = row["3. pickuped"]
-    except:
-        pickuped_amt = "-"
-    try:
-        if (assigned_amt not in ["-", 1] or pickuped_amt not in ["-", 1]) and option == "Yesterday":
-            row["cutoff"] = row["cutoff"] + " 🙀🙀🙀"
-        elif (created_amt not in ["-", 1] or assigned_amt not in ["-", 1]) and option == "Today" and difference_munutes >= 30:
-            row["cutoff"] = row["cutoff"] + " 🙀🙀🙀"
-        elif (created_amt not in ["-", 1] or assigned_amt not in ["-", 1]) and option == "Today" and difference_munutes >= 10:
-            row["cutoff"] = row["cutoff"] + " 🙀"
-    except:
-        print("No warnings")
-    return row
     
     
 def get_claims(secret, date_from, date_to, cursor=0):
@@ -579,10 +545,6 @@ st.dataframe(filtered_frame)
 
 client_timezone = "America/Bogota"
 TODAY = datetime.datetime.now(timezone(client_timezone))
-
-stores_with_not_taken_routes = ', '.join(str(x) for x in routes_not_taken["store_name"].unique())
-st.caption(
-    f'Total of :blue[{len(filtered_frame)}] orders in the table. Following stores have not pickuped routes: :red[{stores_with_not_taken_routes}]')
 
 
 
