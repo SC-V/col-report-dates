@@ -646,18 +646,5 @@ with st.expander(":round_pushpin: Orders on a map"):
         ],
     ))
 
-# if selected_client == "Quiken":
-#     with st.expander(":moneybag: Unreported cash on couriers:"):
-#         st.caption(f'Shows, how much money couriers have with them – and for how many orders. Counting only delivered orders without proof of deposit provided.')
-#         cash_management_df = df[(df["status"].isin(['delivered', 'delivered_finish'])) & (df["cash_collected"] == "Not verified")]
-#         st.dataframe(cash_management_df.groupby(['courier_name'])['price_of_goods'].agg(['sum', 'count']).reset_index())
-
-with st.expander(":clipboard: Store/ route details"): 
-    pivot_report_frame = pandas.pivot_table(filtered_frame, values='claim_id', index=['client', 'store_name', 'route_id', 'cutoff', 'courier_name'], columns=['type'], aggfunc=lambda x: len(x.unique()), fill_value="-").reset_index()
-    pivot_report_frame = pivot_report_frame.apply(lambda row: check_for_lateness(row), axis=1)
-    only_cats = st.checkbox("Only concerned routes")
-    if only_cats:
-        pivot_report_frame = pivot_report_frame[pivot_report_frame['cutoff'].str.contains('🙀')]
-    st.dataframe(pivot_report_frame, use_container_width=True)
 
 streamlit_analytics.stop_tracking()
