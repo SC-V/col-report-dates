@@ -248,27 +248,14 @@ def get_claims(secret, date_from, date_to, cursor=0):
     return claims['claims'], cursor
 
 
-def get_report(client_option="All clients", option="Today", start_=None, end_=None) -> pandas.DataFrame:
+def get_report(client_option="All clients", start_=None, end_=None) -> pandas.DataFrame:
     offset_back = 0
-    if option == "Yesterday":
-        offset_back = 1
-    elif option == "Tomorrow":
-        offset_back = -1
-
     client_timezone = "America/Bogota"
-
-    if not start_:
-        today = datetime.datetime.now(timezone(client_timezone)) - datetime.timedelta(days=offset_back)
-        search_from = today.replace(hour=0, minute=0, second=0, microsecond=0) - datetime.timedelta(days=3)
-        search_to = today.replace(hour=23, minute=59, second=59, microsecond=999999)
-        date_from = search_from.strftime("%Y-%m-%d")
-        date_to = search_to.strftime("%Y-%m-%d")
-    else:
-        today = datetime.datetime.now(timezone(client_timezone))
-        date_from_offset = datetime.datetime.fromisoformat(start_).astimezone(
-            timezone(client_timezone)) - datetime.timedelta(days=2)
-        date_from = date_from_offset.strftime("%Y-%m-%d")
-        date_to = end_
+    today = datetime.datetime.now(timezone(client_timezone))
+    date_from_offset = datetime.datetime.fromisoformat(start_).astimezone(
+        timezone(client_timezone)) - datetime.timedelta(days=2)
+    date_from = date_from_offset.strftime("%Y-%m-%d")
+    date_to = end_
 
     today = today.strftime("%Y-%m-%d")
     report = []
@@ -493,30 +480,29 @@ if st.sidebar.button("Refresh data", type="primary"):
     st.cache_data.clear()
 st.sidebar.caption(f"Page reload doesn't refresh the data.\nInstead, use this button to get a fresh report")
 
+
+startdate = st.sidebar.date_input("Start date")
+enddate = st.sidebar.date_input("End date")
 selected_client = st.sidebar.selectbox(
     "Select client:",
     ["Melonn", "Amoblando Pullman", "Bogota test client", "La Mansion", "Sutex",
      "Laika", "Loto del Sur", "Shopping Go", "Guia Cereza", "Distrihogar",
      "Wild & Pacific", "Studio F", "Bukz", "Tiendas Branchos", "Exiagrícola",
-     "Distrisex", "Vibes", "Stop Jeans", "Medivaric", "Krika", "Vitaliah", "All clients"]
+     "Distrisex", "Vibes", "Stop Jeans", "Medivaric", "Krika", "Vitaliah",
+     "Pasarex", "Crystal", "Foodology","Pa Mascotas", "Fiorenzi", "Medipiel",
+     "Dermos", "Teku", "Undergold", "Explora", "PatPrimo", "All clients"]
 )
 
 #if selected_client == "Petco":
 #    st.caption("Petco POD % metric now includes photos uploaded in the app. Data is synchronized every hour (once every XX:00)")
 
-option = st.sidebar.selectbox(
-    "Select report date:",
-    ["Today", "Yesterday", "Tomorrow", "Monthly"]
-)
 
 
 @st.cache_data
-def get_cached_report(client_option, period):
-
-    if option == "Monthly":
-        report = get_report(client_option, period, start_="2023-09-01", end_="2023-10-31")
-    else:
-        report = get_report(client_option, period)
+def get_cached_report(client_option, start, end):
+    date_start = start.strftime("%Y-%m-%d")
+    date_end = end.strftime("%Y-%m-%d")
+    report = get_report(client_option, start_=date_start, end_=date_end)
     df_rnt = report[~report['status'].isin(["cancelled", "performer_not_found", "failed"])]
     df_rnt = df_rnt.groupby(['courier_name', 'route_id', 'store_name'])['pickup_address'].nunique().reset_index()
     routes_not_taken = df_rnt[(df_rnt['courier_name'] == "No courier yet") & (df_rnt['route_id'] != "No route")]
@@ -526,7 +512,7 @@ def get_cached_report(client_option, period):
     return report, routes_not_taken, delivered_today
 
 
-df, routes_not_taken, delivered_today = get_cached_report(selected_client, option)
+df, routes_not_taken, delivered_today = get_cached_report(selected_client, startdate, enddate)
 
 statuses = st.sidebar.multiselect(
     'Filter by status:',
