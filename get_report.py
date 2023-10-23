@@ -578,9 +578,7 @@ if couriers:
 st.dataframe(filtered_frame)
 
 client_timezone = "America/Bogota"
-TODAY = datetime.datetime.now(timezone(client_timezone)).strftime("%Y-%m-%d") \
-    if option == "Today" \
-    else datetime.datetime.now(timezone(client_timezone)) - datetime.timedelta(days=1)
+TODAY = datetime.datetime.now(timezone(client_timezone))
 
 stores_with_not_taken_routes = ', '.join(str(x) for x in routes_not_taken["store_name"].unique())
 st.caption(
