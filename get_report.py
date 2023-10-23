@@ -561,7 +561,7 @@ col1.metric("Not pickuped routes :minibus:", str(len(routes_not_taken)))
 #  col2.metric("POD provision :100:", pod_provision_rate)
 #else:
 #  col2.metric("POD provision :camera:", pod_provision_rate)
-col3.metric(f"Delivered {option.lower()} :package:", delivered_today)
+col3.metric(f"Delivered :package:", delivered_today)
 
 if (not statuses or statuses == []) and (not stores or stores == []):
     filtered_frame = df
