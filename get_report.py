@@ -46,7 +46,15 @@ SECRETS_MAP = {"Melonn": 0,
                "Teku": 28,
                "Undergold": 29,
                "Explora": 30,
-               "PatPrimo": 31}
+               "PatPrimo": 31,               
+               "Lunia": 32,
+               "La Peau": 33,
+               "Liza Herrera Calzado": 34,
+               "Fenomena": 35,
+               "Offcorss": 36,
+               "Replays": 37,
+               "Axspen": 38,
+               "Alma de las cosas ": 39}
 CLIENTS_MAP = {0: "Melonn",
                1: "Amoblando Pullman",
                2: "Bogota test client",
@@ -78,7 +86,15 @@ CLIENTS_MAP = {0: "Melonn",
                28: "Teku",
                29: "Undergold",
                30: "Explora",
-               31: "PatPrimo",}
+               31: "PatPrimo",
+               32: "Lunia",
+               33: "La Peau",
+               34: "Liza Herrera Calzado",
+               35: "Fenomena",
+               36: "Offcorss",
+               37: "Replays",
+               38: "Axspen",
+               39: "Alma de las cosas "}
 
 statuses = {
     'delivered': {'type': '4. delivered', 'state': 'in progress'},
@@ -354,7 +370,8 @@ selected_client = st.sidebar.selectbox(
      "Wild & Pacific", "Studio F", "Bukz", "Tiendas Branchos", "Exiagrícola",
      "Distrisex", "Vibes", "Stop Jeans", "Medivaric", "Krika", "Vitaliah",
      "Pasarex", "Crystal", "Foodology","Pa Mascotas", "Fiorenzi", "Medipiel",
-     "Dermos", "Teku", "Undergold", "Explora", "PatPrimo", "All clients"]
+     "Dermos", "Teku", "Undergold", "Explora", "PatPrimo", "Lunia", "La Peau", "Liza Herrera Calzado", 
+     "Fenomena", "Offcorss", "Replays", "Axspen", "Alma de las cosas ","All clients"]
 )
 
 @st.cache_data
