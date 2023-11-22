@@ -6,22 +6,14 @@ import numpy
 import io
 import time
 import re
-import haversine as hs
 from pytz import timezone
-from googleapiclient import discovery
 import streamlit as st
-import streamlit_analytics
 import pydeck as pdk
 
 st.set_page_config(layout="wide")
 
 FILE_BUFFER = io.BytesIO()
-# DEFAULT_CLAIM_SECRET = st.secrets["CLAIM_SECRET"]
 CLAIM_SECRETS = st.secrets["CLAIM_SECRETS"]
-# SHEET_KEY = st.secrets["SHEET_KEY"]
-# SHEET_ID = st.secrets["SHEET_ID"]
-# COD_SHEET_KEY = st.secrets["COD_SHEET_KEY"]
-# COD_SHEET_ID = st.secrets["COD_SHEET_ID"]
 API_URL = st.secrets["API_URL"]
 SECRETS_MAP = {"Melonn": 0,
                "Amoblando Pullman": 1,
@@ -109,83 +101,10 @@ statuses = {
     'pickup_arrived': {'type': '2. assigned', 'state': 'in progress'},
     'estimating_failed': {'type': 'X. cancelled', 'state': 'final'},
     'cancelled_with_payment': {'type': 'X. cancelled', 'state': 'final'}
-}
-
-def calculate_distance(row):
-    location_1 = (row["lat"], row["lon"])
-    location_2 = (row["store_lat"], row["store_lon"])
-    row["linear_distance"] = round(hs.haversine(location_1, location_2), 2)
-    return row
-
-
-# def get_pod_orders():
-#    service = discovery.build('sheets', 'v4', discoveryServiceUrl=
-#    'https://sheets.googleapis.com/$discovery/rest?version=v4',
-#                              developerKey=SHEET_KEY)
-#
-#    spreadsheet_id = SHEET_ID
-#    range_ = 'A:A'
-#
-#    request = service.spreadsheets().values().get(spreadsheetId=spreadsheet_id, range=range_)
-#    response = request.execute()
-#    pod_orders = [item for sublist in response["values"] for item in sublist]
-#    return pod_orders
-
-
-# def check_for_pod(row, orders_with_pod):
-#    if row["status"] not in ["delivered", "delivered_finish"]:
-#        row["proof"] = "-"
-#        return row
-#    if str(row["client_id"]) in orders_with_pod:
-#        row["proof"] = "Proof provided"
-#    else:
-#        row["proof"] = "No proof"
-#    return row
-
-
-# def get_cod_orders():
-#    service = discovery.build('sheets', 'v4', discoveryServiceUrl=
-#    'https://sheets.googleapis.com/$discovery/rest?version=v4',
-#                              developerKey=COD_SHEET_KEY)
-#    spreadsheet_id = COD_SHEET_ID
-#
-#    range_ = 'C:C'
-#    request = service.spreadsheets().values().get(spreadsheetId=spreadsheet_id, range=range_)
-#    response = request.execute()
-#    cod_orders = [item for sublist in response["values"] for item in sublist]
-#    cod_orders = [item.replace(' ', '').replace('TRK', '') for item in cod_orders]
-#
-#    range_ = 'E:E'
-#    request = service.spreadsheets().values().get(spreadsheetId=spreadsheet_id, range=range_)
-#    response = request.execute()
-#    cod_links = [item for sublist in response["values"] for item in sublist]
-#
-#    orders_with_links = dict(zip(cod_orders, cod_links))
-#    return orders_with_links
-
-
-# def check_for_cod(row, orders_with_cod: dict):
-#    if row["price_of_goods"] < 1:
-#        row["cash_collected"] = "Prepaid"
-#        row["cash_prooflink"] = "Prepaid"
-#        return row
-#    if row["status"] not in ["delivered", "delivered_finish"]:
-#        row["cash_collected"] = "-"
-#        row["cash_prooflink"] = "-"
-#        return row
-#    if str(row["client_id"]) in orders_with_cod.keys():
-#        row["cash_collected"] = "Deposit verified"
-#        row["cash_prooflink"] = orders_with_cod[row["client_id"]]
-#    else:
-#        row["cash_collected"] = "Not verified"
-#        row["cash_prooflink"] = "No link"
-#    return row
-
-    
+}    
     
 def get_claims(secret, date_from, date_to, cursor=0):
     url = API_URL
-#    url = "https://b2b.taxi.yandex.net/b2b/cargo/integration/v2/claims/search"
   
     timezone_offset = "-05:00"
     payload = json.dumps({
@@ -194,8 +113,6 @@ def get_claims(secret, date_from, date_to, cursor=0):
         "limit": 1000,
         "cursor": cursor
     }) if cursor == 0 else json.dumps({"cursor": cursor})
-
-    #client_secret = CLAIM_SECRETS[SECRETS_MAP[selected_client]]
 
     headers = {
         'Content-Type': 'application/json',
@@ -245,8 +162,6 @@ def get_report(client_option="All clients", start_=None, end_=None) -> pandas.Da
                   if cutoff_date != today:
                       continue
               report_cutoff = cutoff_time.strftime("%Y-%m-%d %H:%M")
-#               print(f"CLAIM: {claim['id']}, {date_from}, {date_to}")
-#               print(f"problem: {claim['route_points'][1]['external_order_id']}")
               report_client = CLIENTS_MAP[client_number]
               try:
                   report_client_id = claim['route_points'][1]['external_order_id'].replace("\t", " ")
@@ -339,8 +254,6 @@ def get_report(client_option="All clients", start_=None, end_=None) -> pandas.Da
                  if cutoff_date != today:
                     continue
               report_cutoff = cutoff_time.strftime("%Y-%m-%d %H:%M")
-  #            print(f"CLAIM: {claim['id']}, {date_from}, {date_to}")
-  #            print(f"problem: {claim['route_points'][1]['external_order_id']}")
               report_client = selected_client
               try:
                   report_client_id = claim['route_points'][1]['external_order_id'].replace("\t", " ")
@@ -422,24 +335,9 @@ def get_report(client_option="All clients", start_=None, end_=None) -> pandas.Da
                                              "return_reason", "return_comment", "cancel_comment",
                                              "route_id", "lon", "lat", "store_lon", "store_lat", "price_of_goods", "items",
                                              "extracted_weight", "type", "is_final"])
-#    orders_with_pod = get_pod_orders()
-    result_frame = result_frame.apply(lambda row: calculate_distance(row), axis=1)
-#    result_frame = result_frame.apply(lambda row: check_for_pod(row, orders_with_pod), axis=1)
-#    orders_with_cod = get_cod_orders()
-#    if option != "Tomorrow":
-#        try:
-#            result_frame.insert(3, 'proof', result_frame.pop('proof'))
-#        except:
-#            print("POD malfunction, skip column reorder")
-#     if selected_client in ["Not specified"]:
-#         result_frame = result_frame.apply(lambda row: check_for_cod(row, orders_with_cod), axis=1)
-#         result_frame.insert(4, 'cash_collected', result_frame.pop('cash_collected'))
-#         result_frame.insert(5, 'cash_prooflink', result_frame.pop('cash_prooflink'))
-#         result_frame.insert(6, 'price_of_goods', result_frame.pop('price_of_goods'))
     return result_frame
 
 
-streamlit_analytics.start_tracking()
 st.markdown(f"# Routes report")
 
 if st.sidebar.button("Refresh data", type="primary"):
@@ -458,11 +356,6 @@ selected_client = st.sidebar.selectbox(
      "Pasarex", "Crystal", "Foodology","Pa Mascotas", "Fiorenzi", "Medipiel",
      "Dermos", "Teku", "Undergold", "Explora", "PatPrimo", "All clients"]
 )
-
-#if selected_client == "Petco":
-#    st.caption("Petco POD % metric now includes photos uploaded in the app. Data is synchronized every hour (once every XX:00)")
-
-
 
 @st.cache_data
 def get_cached_report(client_option, start, end):
@@ -511,11 +404,6 @@ couriers = st.sidebar.multiselect(
     df["courier_name"].unique()
 )
 
-#only_no_proofs = st.sidebar.checkbox("Only parcels without proofs")
-
-#if only_no_proofs:
-#    df = df[df["proof"] == "No proof"]
-
 without_cancelled = st.sidebar.checkbox("Without cancels")
 
 if without_cancelled:
@@ -523,10 +411,6 @@ if without_cancelled:
     
 col1, col3 = st.columns(2)
 col1.metric("Not pickuped routes :minibus:", str(len(routes_not_taken)))
-#if pod_provision_rate == "100%": 
-#  col2.metric("POD provision :100:", pod_provision_rate)
-#else:
-#  col2.metric("POD provision :camera:", pod_provision_rate)
 col3.metric(f"Delivered :package:", delivered_today)
 
 if (not statuses or statuses == []) and (not stores or stores == []):
@@ -545,9 +429,6 @@ st.dataframe(filtered_frame)
 
 client_timezone = "America/Bogota"
 TODAY = datetime.datetime.now(timezone(client_timezone))
-
-
-
 
 if st.checkbox("enable download"):
     with pandas.ExcelWriter(FILE_BUFFER, engine='xlsxwriter') as writer:
@@ -645,6 +526,3 @@ with st.expander(":round_pushpin: Orders on a map"):
             )
         ],
     ))
-
-
-streamlit_analytics.stop_tracking()
