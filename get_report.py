@@ -54,7 +54,8 @@ SECRETS_MAP = {"Melonn": 0,
                "Offcorss": 36,
                "Replays": 37,
                "Axspen": 38,
-               "Alma de las cosas ": 39}
+               "Alma de las cosas ": 39,
+               "Filage": 40}
 CLIENTS_MAP = {0: "Melonn",
                1: "Amoblando Pullman",
                2: "Bogota test client",
@@ -94,7 +95,8 @@ CLIENTS_MAP = {0: "Melonn",
                36: "Offcorss",
                37: "Replays",
                38: "Axspen",
-               39: "Alma de las cosas "}
+               39: "Alma de las cosas ",
+               40: "Filage"}
 
 statuses = {
     'delivered': {'type': '4. delivered', 'state': 'in progress'},
