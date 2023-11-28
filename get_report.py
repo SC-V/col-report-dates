@@ -55,7 +55,8 @@ SECRETS_MAP = {"Melonn": 0,
                "Replays": 37,
                "Axspen": 38,
                "Alma de las cosas ": 39,
-               "Filage": 40}
+               "Filage": 40,
+               "Vera y Estopa": 41}
 CLIENTS_MAP = {0: "Melonn",
                1: "Amoblando Pullman",
                2: "Bogota test client",
@@ -96,7 +97,8 @@ CLIENTS_MAP = {0: "Melonn",
                37: "Replays",
                38: "Axspen",
                39: "Alma de las cosas ",
-               40: "Filage"}
+               40: "Filage",
+               41: "Vera y Estopa"}
 
 statuses = {
     'delivered': {'type': '4. delivered', 'state': 'in progress'},
@@ -373,7 +375,7 @@ selected_client = st.sidebar.selectbox(
      "Distrisex", "Vibes", "Stop Jeans", "Medivaric", "Krika", "Vitaliah",
      "Pasarex", "Crystal", "Foodology","Pa Mascotas", "Fiorenzi", "Medipiel",
      "Dermos", "Teku", "Undergold", "Explora", "PatPrimo", "Lunia", "La Peau", "Liza Herrera Calzado", 
-     "Fenomena", "Offcorss", "Replays", "Axspen", "Alma de las cosas ","All clients"]
+     "Fenomena", "Offcorss", "Replays", "Axspen", "Alma de las cosas ", "Filage", "Vera y Estopa", "All clients"]
 )
 
 @st.cache_data
