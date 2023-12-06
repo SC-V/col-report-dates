@@ -249,12 +249,26 @@ def get_report(client_option="All clients", start_=None, end_=None) -> pandas.Da
                           report_weight_kg = report_weight_kg + float(re.findall(r"(\d*\.?\d+)\s*(kgs?)\b", str(item['title']), flags=re.IGNORECASE)[0][0])
               except:
                   report_weight_kg = "Not found"
+              try:
+                  report_point_B_time = datetime.datetime.strptime(claim['route_points'][1]['visited_at']['actual'],"%Y-%m-%dT%H:%M:%S.%f%z").astimezone(timezone(client_timezone))
+                  report_point_B_time = report_point_B_time.strftime("%Y-%m-%dT%H:%M:%S.%f%z")
+              except:
+                  report_point_B_time = "Point B was never visited"
+              try:
+                  report_point_A_time = datetime.datetime.strptime(claim['route_points'][0]['visited_at']['actual'],"%Y-%m-%dT%H:%M:%S.%f%z").astimezone(timezone(client_timezone))
+                  report_point_A_time = report_point_A_time.strftime("%Y-%m-%dT%H:%M:%S.%f%z")
+              except:
+                  report_point_A_time = "Point A missing pick datetime"
+              try:
+                  report_general_comment = claim['comment']
+              except:
+                  report_general_comment = "No comment"
               row = [report_cutoff, report_client, report_client_id, report_claim_id, report_pod_point_id,
                     report_pickup_address, report_receiver_name, report_comment,
                     report_status, report_status_time, report_store_name, report_courier_name, report_courier_park,
                     report_return_reason, report_return_comment, report_autocancel_reason, report_route_id,
                     report_longitude, report_latitude, report_store_longitude, report_store_latitude, report_price_of_goods, report_goods, 
-                    report_weight_kg, report_status_type, report_status_is_final]
+                    report_weight_kg, report_status_type, report_status_is_final, report_point_A_time, report_point_B_time, report_general_comment]
               report.append(row)
           client_number += 1
     else:
@@ -341,12 +355,26 @@ def get_report(client_option="All clients", start_=None, end_=None) -> pandas.Da
                           report_weight_kg = report_weight_kg + float(re.findall(r"(\d*\.?\d+)\s*(kgs?)\b", str(item['title']), flags=re.IGNORECASE)[0][0])
               except:
                   report_weight_kg = "Not found"
+              try:
+                  report_point_B_time = datetime.datetime.strptime(claim['route_points'][1]['visited_at']['actual'],"%Y-%m-%dT%H:%M:%S.%f%z").astimezone(timezone(client_timezone))
+                  report_point_B_time = report_point_B_time.strftime("%Y-%m-%dT%H:%M:%S.%f%z")
+              except:
+                  report_point_B_time = "Point B was never visited"
+              try:
+                  report_point_A_time = datetime.datetime.strptime(claim['route_points'][0]['visited_at']['actual'],"%Y-%m-%dT%H:%M:%S.%f%z").astimezone(timezone(client_timezone))
+                  report_point_A_time = report_point_A_time.strftime("%Y-%m-%dT%H:%M:%S.%f%z")
+              except:
+                  report_point_A_time = "Point A missing pick datetime"
+              try:
+                  report_general_comment = claim['comment']
+              except:
+                  report_general_comment = "No comment"
               row = [report_cutoff, report_client, report_client_id, report_claim_id, report_pod_point_id,
                     report_pickup_address, report_receiver_address, report_comment,
                     report_status, report_status_time, report_store_name, report_courier_name, report_courier_park,
                     report_return_reason, report_return_comment, report_autocancel_reason, report_route_id,
                     report_longitude, report_latitude, report_store_longitude, report_store_latitude, report_price_of_goods, report_goods, 
-                    report_weight_kg, report_status_type, report_status_is_final]
+                    report_weight_kg, report_status_type, report_status_is_final, report_point_A_time, report_point_B_time, report_general_comment]
               report.append(row)
     result_frame = pandas.DataFrame(report,
                                     columns=["cutoff", "client", "client_id", "claim_id", "pod_point_id",
@@ -354,7 +382,7 @@ def get_report(client_option="All clients", start_=None, end_=None) -> pandas.Da
                                              "store_name", "courier_name", "courier_park",
                                              "return_reason", "return_comment", "cancel_comment",
                                              "route_id", "lon", "lat", "store_lon", "store_lat", "price_of_goods", "items",
-                                             "extracted_weight", "type", "is_final"])
+                                             "extracted_weight", "type", "is_final", "point_a_time", "point_b_time", "general_comment"])
     return result_frame
 
 
